@@ -1,22 +1,22 @@
 require 'open-uri'
 require 'nokogiri'
 
-#page class
-#holds and ouputs data relating to a single page
+# Page class
+# Holds and ouputs data relating to a single page
 #---------------------------------------------------
 class Page
   def initialize(link, html, output_iterator)
-  	@link          = link
-  	@output_number = output_iterator
-  	@words         = Hash.new(0)
-  	@temp_words    = Nokogiri::HTML.parse(html)
-  	@fixed_array   = Array.new
-  	
-  	clean_words
+	  @link          = link
+	  @output_number = output_iterator
+	  @words         = Hash.new(0)
+	  @temp_words    = Nokogiri::HTML.parse(html)
+	  @fixed_array   = Array.new
+	
+	  clean_words
 
-  	count_words
+	  count_words
 
-  	print
+	  print
   end
 
   def clean_words
@@ -24,8 +24,8 @@ class Page
   end
 
   def count_words
-    @temp_words.each do |word|
-      @fixed_array.push(word[0])
+    @fixed_array = @temp_words.map do |word|
+      word[0]
     end
 
     @fixed_array.map { |key| @words[key] += 1 }
@@ -49,12 +49,12 @@ class Page
 end
 
 
-#Scraper Class
-#Scrapes Urls and turns them into page objects
+# Scraper Class
+# Scrapes Urls and turns them into page objects
 #--------------------------------------------------------
 class Scraper
-  #the below take the place of the global variables from
-  #the previous crawler
+  # The below take the place of the global variables from
+  # The previous crawler
   attr_reader :links, :link_count, :words 
 
   def initialize
@@ -64,7 +64,7 @@ class Scraper
     @link_count      = Hash.new
   end
 
-  #retrieve html and send to other methods
+  # Retrieve html and send to other methods
   def scrape(url)
     begin
       temp_html = Nokogiri::HTML(open(url))
@@ -82,19 +82,19 @@ class Scraper
     end
   end
 
-  #get rid of scripts and other nasties in the html
+  # Get rid of scripts and other nasties in the html
   def clean(html)
     html.xpath("//script").remove
   end
 
-  #add links to their container
+  # Add links to their container
   def update_links(html)
-    @links.push(*html.css("a"))#maybe push isnt the best idea
+    @links.push(*html.css("a")) # Maybe push isnt the best idea
 
-    @links = @links.uniq#test if you can just @links.uniq
+    @links = @links.uniq # Test if you can just @links.uniq
   end
 
-  #follow the next link down the line, and start over again
+  # Follow the next link down the line, and start over again
   def explore_links
     @links.each do |link|
       if (link["href"] || '').include? "/science-technology/"
